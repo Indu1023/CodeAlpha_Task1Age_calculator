@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Age Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00f0ff; /* Cyan */
+            --secondary-color: #ff00f0; /* Magenta */
+            --bg-color-start: #0a0e1c;
+            --bg-color-end: #020712;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --border-color: rgba(0, 240, 255, 0.3);
+            --text-color: #e0e7f2;
+            --heading-color: #ffffff;
+            --error-color: #ff4d4d;
+        }
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, var(--bg-color-start) 0%, var(--bg-color-end) 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80vh;
+            height: 80vh;
+            background: radial-gradient(circle, var(--primary-color) 0%, transparent 60%);
+            transform: translate(-50%, -50%);
+            opacity: 0.1;
+            animation: pulse 10s infinite ease-in-out;
+            z-index: -1;
+        }
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.1; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.2; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0.1; }
+        }
+        .container {
+            backdrop-filter: blur(15px);
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.1);
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.8s ease-in-out;
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.02) 0, rgba(255, 255, 255, 0.02) 2px, transparent 2px, transparent 20px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: moveGrid 60s linear infinite;
+        }
+        @keyframes moveGrid {
+            from { background-position: 0 0; }
+            to { background-position: 100vh 100vh; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px) rotateX(-5deg); }
+            to { opacity: 1; transform: translateY(0) rotateX(0); }
+        }
+        h1 {
+            color: var(--heading-color);
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px var(--primary-color);
+        }
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--primary-color);
+            text-shadow: 0 0 3px rgba(0, 240, 255, 0.5);
+        }
+        .input-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .input-group input {
+            flex: 1;
+            min-width: 80px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 16px;
+            color: var(--text-color);
+            transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s;
+            text-align: center;
+            box-shadow: inset 0 0 5px rgba(0, 240, 255, 0.1);
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 10px var(--secondary-color), inset 0 0 10px var(--secondary-color);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .error {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 8px;
+            text-align: right;
+            min-height: 20px;
+            font-weight: 500;
+            text-shadow: 0 0 3px rgba(255, 77, 77, 0.5);
+        }
+        .error.hidden {
+            visibility: hidden;
+        }
+        button {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: #ffffff;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            letter-spacing: 1px;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.5);
+        }
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+        }
+        #result {
+            margin-top: 40px;
+            padding: 30px;
+            border-radius: 15px;
+            display: none;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
+            text-align: center;
+            animation: slideIn 0.5s forwards;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #result p {
+            font-weight: 400;
+            margin: 10px 0;
+        }
+        #result .main-age {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: var(--text-color);
+            line-height: 1.2;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+        }
+        #result .main-age span {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-shadow: 0 0 8px var(--primary-color), 0 0 15px var(--primary-color);
+            transition: transform 0.3s ease-in-out;
+            display: inline-block;
+        }
+        .advanced-details {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        @media (min-width: 500px) {
+            .advanced-details {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        .advanced-details div {
+            padding: 15px;
+            background-color: rgba(0, 240, 255, 0.05);
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--primary-color);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 5px rgba(0, 240, 255, 0.1);
+        }
+        .advanced-details div::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .advanced-details div:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .advanced-details div:hover::before {
+            opacity: 1;
+        }
+        .advanced-details div span {
+            display: block;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            text-shadow: 0 0 5px var(--secondary-color);
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            backdrop-filter: blur(15px);
+            background-color: rgba(17, 25, 40, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 77, 77, 0.5);
+            z-index: 1000;
+            display: none;
+            text-align: center;
+        }
+        .message-box h3 {
+            margin-top: 0;
+            color: var(--error-color);
+            text-shadow: 0 0 5px var(--error-color);
+        }
+        .message-box p {
+            margin-bottom: 20px;
+        }
+        .message-box button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+        .message-box button:active {
+            transform: translateY(0);
+        }
+        .section-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            text-shadow: 0 0 3px var(--primary-color);
+        }
+        .milestone-container {
+            margin-top: 20px;
+            background-color: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
+        }
+        .milestone-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        .milestone-text span {
+            font-weight: 700;
+            color: var(--secondary-color);
+            text-shadow: 0 0 5px var(--secondary-color);
+        }
+        .zodiac-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .zodiac-item {
+            background-color: rgba(255, 0, 240, 0.05);
+            border: 1px solid rgba(255, 0, 240, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 5px rgba(255, 0, 240, 0.1);
+        }
+        .zodiac-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--secondary-color);
+        }
+        .zodiac-item h4 {
+            margin: 0 0 5px 0;
+            color: var(--secondary-color);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .zodiac-item p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>CYBER AGE CALCULATOR</h1>
+    <form id="age-form">
+        <div class="form-group">
+            <label for="dob-day">Date of Birth</label>
+            <div class="input-group">
+                <input type="text" id="dob-day" placeholder="DD" maxlength="2" required>
+                <input type="text" id="dob-month" placeholder="MM" maxlength="2" required>
+                <input type="text" id="dob-year" placeholder="YYYY" maxlength="4" required>
+            </div>
+            <div class="error" id="error-message"></div>
+        </div>
+        <button type="submit">CALCULATE</button>
+    </form>
+    <div id="result">
+        <p class="main-age">
+            You are <span id="years">0</span> years, <span id="months">0</span> months, <span id="days">0</span> days old.
+        </p>
+
+        <div class="section-title">Milestones</div>
+        <div class="milestone-container">
+            <p class="milestone-text">Your next birthday is in <span id="next-birthday-days">0</span> days.</p>
+        </div>
+
+        <div class="section-title">Zodiac Signs</div>
+        <div class="zodiac-container">
+            <div class="zodiac-item">
+                <h4>Western Zodiac</h4>
+                <p id="western-zodiac">---</p>
+            </div>
+            <div class="zodiac-item">
+                <h4>Chinese Zodiac</h4>
+                <p id="chinese-zodiac">---</p>
+            </div>
+        </div>
+
+        <div class="section-title">Life in Numbers</div>
+        <div class="advanced-details">
+            <div><span id="total-months">0</span> Total Months</div>
+            <div><span id="total-weeks">0</span> Total Weeks</div>
+            <div><span id="total-days">0</span> Total Days</div>
+            <div><span id="total-hours">0</span> Total Hours</div>
+            <div><span id="total-minutes">0</span> Total Minutes</div>
+        </div>
+    </div>
+</div>
+
+<div id="message-box" class="message-box">
+    <h3 id="message-title"></h3>
+    <p id="message-text"></p>
+    <button onclick="hideMessageBox()">OK</button>
+</div>
+
+<script>
+    const form = document.getElementById('age-form');
+    const dayInput = document.getElementById('dob-day');
+    const monthInput = document.getElementById('dob-month');
+    const yearInput = document.getElementById('dob-year');
+    const resultDiv = document.getElementById('result');
+    const yearsSpan = document.getElementById('years');
+    const monthsSpan = document.getElementById('months');
+    const daysSpan = document.getElementById('days');
+    const errorMsg = document.getElementById('error-message');
+    const nextBirthdayDaysSpan = document.getElementById('next-birthday-days');
+    const westernZodiacSpan = document.getElementById('western-zodiac');
+    const chineseZodiacSpan = document.getElementById('chinese-zodiac');
+    const totalMonthsSpan = document.getElementById('total-months');
+    const totalWeeksSpan = document.getElementById('total-weeks');
+    const totalDaysSpan = document.getElementById('total-days');
+    const totalHoursSpan = document.getElementById('total-hours');
+    const totalMinutesSpan = document.getElementById('total-minutes');
+    const messageBox = document.getElementById('message-box');
+    const messageTitle = document.getElementById('message-title');
+    const messageText = document.getElementById('message-text');
+
+    function showMessageBox(title, text) {
+        messageTitle.textContent = title;
+        messageText.textContent = text;
+        messageBox.style.display = 'block';
+    }
+
+    function hideMessageBox() {
+        messageBox.style.display = 'none';
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Clear previous results and errors
+        resultDiv.style.display = 'none';
+        errorMsg.textContent = '';
+        errorMsg.classList.add('hidden');
+
+        const day = parseInt(dayInput.value, 10);
+        const month = parseInt(monthInput.value, 10);
+        const year = parseInt(yearInput.value, 10);
+        
+        // Input validation
+        if (isNaN(day) || isNaN(month) || isNaN(year)) {
+            errorMsg.textContent = 'Please enter valid numbers for all fields.';
+            errorMsg.classList.remove('hidden');
+            return;
+        }
+
+        const dob = new Date(year, month - 1, day);
+        const today = new Date();
+
+        // Check if the date is valid
+        if (dob.getFullYear() !== year || dob.getMonth() !== month - 1 || dob.getDate() !== day) {
+            errorMsg.textContent = 'Please enter a valid date.';
+            errorMsg.classList.remove('hidden');
+            return;
+        }
+        
+        // Check if the date is in the future
+        if (dob > today) {
+            errorMsg.textContent = 'Date of birth cannot be in the future.';
+            errorMsg.classList.remove('hidden');
+            return;
+        }
+        
+        calculateAndDisplayAge(dob, today);
+    });
+
+    function calculateAndDisplayAge(dob, today) {
+        let years = today.getFullYear() - dob.getFullYear();
+        let months = today.getMonth() - dob.getMonth();
+        let days = today.getDate() - dob.getDate();
+
+        // Adjust months and years if days and months are negative
+        if (days < 0) {
+            months--;
+            const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+            days += prevMonth.getDate();
+        }
+
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+        
+        yearsSpan.textContent = years;
+        monthsSpan.textContent = months;
+        daysSpan.textContent = days;
+        
+        // Calculate days until next birthday
+        const nextBirthday = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
+        if (nextBirthday < today) {
+            nextBirthday.setFullYear(today.getFullYear() + 1);
+        }
+        const diffDays = Math.ceil((nextBirthday - today) / (1000 * 60 * 60 * 24));
+        nextBirthdayDaysSpan.textContent = diffDays;
+
+        // Determine Zodiac signs
+        westernZodiacSpan.textContent = getWesternZodiac(dob.getDate(), dob.getMonth() + 1);
+        chineseZodiacSpan.textContent = getChineseZodiac(dob.getFullYear());
+
+        // Calculate total advanced details
+        const diffInMilliseconds = today.getTime() - dob.getTime();
+        const totalDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+        const totalWeeks = Math.floor(totalDays / 7);
+        const totalHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
+        const totalMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
+        
+        // Animate the numbers
+        animateNumber(totalMonthsSpan, (years * 12) + months);
+        animateNumber(totalWeeksSpan, totalWeeks);
+        animateNumber(totalDaysSpan, totalDays);
+        animateNumber(totalHoursSpan, totalHours);
+        animateNumber(totalMinutesSpan, totalMinutes);
+
+        resultDiv.style.display = 'block';
+    }
+
+    // Function to animate numbers
+    function animateNumber(element, finalValue) {
+        const duration = 1500; // milliseconds
+        const startValue = 0;
+        let startTime = null;
+
+        const step = (timestamp) => {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            const percentage = Math.min(progress / duration, 1);
+            const value = Math.floor(percentage * (finalValue - startValue) + startValue);
+            element.textContent = value.toLocaleString(); // Add toLocaleString for number formatting
+
+            if (percentage < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+
+        window.requestAnimationFrame(step);
+    }
+    
+    // Function to determine Western Zodiac Sign
+    function getWesternZodiac(day, month) {
+        if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) { return "Aquarius"; }
+        if ((month == 2 && day >= 19) || (month == 3 && day <= 20)) { return "Pisces"; }
+        if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) { return "Aries"; }
+        if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) { return "Taurus"; }
+        if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) { return "Gemini"; }
+        if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) { return "Cancer"; }
+        if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) { return "Leo"; }
+        if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) { return "Virgo"; }
+        if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) { return "Libra"; }
+        if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) { return "Scorpio"; }
+        if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) { return "Sagittarius"; }
+        if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) { return "Capricorn"; }
+        return "Unknown";
+    }
+
+    // Function to determine Chinese Zodiac Sign
+    function getChineseZodiac(year) {
+        const zodiacs = ["Rat", "Ox", "Tiger", "Rabbit", "Dragon", "Snake", "Horse", "Goat", "Monkey", "Rooster", "Dog", "Pig"];
+        const startYear = 1924; // Year of the Rat
+        return zodiacs[(year - startYear) % 12];
+    }
+</script>
+
+</body>
+</html>
